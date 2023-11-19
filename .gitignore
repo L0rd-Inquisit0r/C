@@ -1,0 +1,9 @@
+#ignore all .exe files
+*.exe
+
+#ignore the vscode folder
+.vscode
+
+#ignores files that are to be read and written
+*.txt
+*.dat
