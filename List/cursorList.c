@@ -2,38 +2,38 @@
 #define MAX 5
 #define null -1
 
-typedef int CURSOR;
+typedef int LIST;
 
 typedef struct node
 {
     char data;
-    CURSOR link;
+    LIST link;
 }NODE;
 
 typedef struct heap
 {
     NODE elem[MAX];
-    CURSOR avail;
+    LIST avail;
 }HEAP;
 
-CURSOR alloc(HEAP* H);
-void dealloc(HEAP* H, CURSOR del);
+LIST alloc(HEAP* H);
+void dealloc(HEAP* H, LIST del);
 void initHeap(HEAP* H);
 
-void initList(CURSOR* head);
-void nullList(HEAP* H, CURSOR* head);
-void insFirst(HEAP* H,CURSOR* head,char elem);
-void insLast(HEAP* H,CURSOR* head,char elem);
-void insert(HEAP* H,CURSOR* head,char elem,int ndx);
-void delFirst(HEAP* H,CURSOR* head);
-void delLast(HEAP* H,CURSOR* head);
-void delete(HEAP* H,CURSOR* head,int ndx);
-void display(HEAP H, CURSOR head);
+void initList(LIST* head);
+void nullList(HEAP* H, LIST* head);
+void insFirst(HEAP* H,LIST* head,char elem);
+void insLast(HEAP* H,LIST* head,char elem);
+void insert(HEAP* H,LIST* head,char elem,int ndx);
+void delFirst(HEAP* H,LIST* head);
+void delLast(HEAP* H,LIST* head);
+void delete(HEAP* H,LIST* head,int ndx);
+void display(HEAP H, LIST head);
 
 int main ()
 {
     HEAP H;
-    CURSOR head;
+    LIST head;
     initHeap(&H);
 
     initList(&head);
@@ -52,15 +52,15 @@ int main ()
     return 0;   
 }
 
-CURSOR alloc(HEAP* H)
+LIST alloc(HEAP* H)
 {
-    CURSOR ret=H->avail;
+    LIST ret=H->avail;
     H->avail=H->elem[ret].link;
     H->elem[ret].link=null;
     return ret;
 }
 
-void dealloc(HEAP* H, CURSOR del)
+void dealloc(HEAP* H, LIST del)
 {
     H->elem[del].link=H->avail;
     H->avail=del;
@@ -76,28 +76,28 @@ void initHeap(HEAP* H)
     }
 }
 
-void initList(CURSOR* head)
+void initList(LIST* head)
 {
     *head=null;
 }
 
-void nullList(HEAP* H,CURSOR* head)
+void nullList(HEAP* H,LIST* head)
 {
     for(;*head!=null;delFirst(H,head));
 }
 
-void insFirst(HEAP* H,CURSOR* head, char elem)
+void insFirst(HEAP* H,LIST* head, char elem)
 {
-    CURSOR ndx=alloc(H);
+    LIST ndx=alloc(H);
     H->elem[ndx].data=elem;
     H->elem[ndx].link=*head;
     *head=ndx;
 }
 
-void insLast(HEAP* H,CURSOR* head, char elem)
+void insLast(HEAP* H,LIST* head, char elem)
 {
-    CURSOR ndx=alloc(H);
-    CURSOR trav;
+    LIST ndx=alloc(H);
+    LIST trav;
     H->elem[ndx].data=elem;
     if(*head==null)
     {
@@ -109,9 +109,9 @@ void insLast(HEAP* H,CURSOR* head, char elem)
     }
 }
 
-void insert(HEAP* H,CURSOR* head,char elem,int ndx)
+void insert(HEAP* H,LIST* head,char elem,int ndx)
 {
-    CURSOR trav,node=alloc(H);
+    LIST trav,node=alloc(H);
     int ctr;
     H->elem[node].data=elem;
     if(*head!=null||ndx!=0)
@@ -129,9 +129,9 @@ void insert(HEAP* H,CURSOR* head,char elem,int ndx)
     }
 }
 
-void delFirst(HEAP* H,CURSOR* head)
+void delFirst(HEAP* H,LIST* head)
 {
-    CURSOR del;
+    LIST del;
     if(*head!=null)
     {
         del=*head;
@@ -140,9 +140,9 @@ void delFirst(HEAP* H,CURSOR* head)
     }
 }
 
-void delLast(HEAP *H,CURSOR* head)
+void delLast(HEAP *H,LIST* head)
 {
-    CURSOR trav;
+    LIST trav;
     if(*head!=null)
     {
         for(trav=*head;H->elem[trav].link!=null;trav=H->elem[trav].link){}
@@ -151,9 +151,9 @@ void delLast(HEAP *H,CURSOR* head)
     }
 }
 
-void delete(HEAP *H,CURSOR* head,int ndx)
+void delete(HEAP *H,LIST* head,int ndx)
 {
-    CURSOR trav,prev,del;
+    LIST trav,prev,del;
     int ctr;
     if(*head!=null)
     {
@@ -170,9 +170,9 @@ void delete(HEAP *H,CURSOR* head,int ndx)
     }
 }
 
-void display(HEAP H,CURSOR head)
+void display(HEAP H,LIST head)
 {
-    CURSOR trav;
+    LIST trav;
     for(trav=head;trav!=null;trav=H.elem[trav].link)
     {
         printf("%c|%d",H.elem[trav].data,H.elem[trav].link);
