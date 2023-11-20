@@ -43,7 +43,7 @@ void delete(SET *set,int ndx)
 void display(SET set)
 {
     SET ndx=1;
-    for(ndx<<=7;ndx!=0;ndx>>=1)
+    for(ndx<<=sizeof(SET)*8-1;ndx!=0;ndx>>=1)
     {
         printf("%d",(set&ndx)?1:0);
     }
