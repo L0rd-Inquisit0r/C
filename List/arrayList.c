@@ -37,13 +37,10 @@ void main()
     delete(&array,2);
 
     display(array);
-
-    nullArr(array);
 }
 
 void initArr(LIST* L)
 {
-    LIST L;
     L->count=0;
 }
 
