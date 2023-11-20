@@ -1,76 +1,63 @@
 #include<stdio.h>
-#include<stdlib.h>
 #include<stdbool.h>
 #define MAX 5
 
 typedef struct
 {
-    char *data;
+    char data[MAX];
     int top;
-}*STACK,ARRAY;
+}STACK;
 
-STACK initStack();
-void nullStack(STACK S);
+void initStack(STACK* S);
 bool isEmpty(STACK S);
 bool isFull(STACK S);
-void push(STACK S,char elem);
-void pop(STACK S);
+void push(STACK* S,char elem);
+void pop(STACK* S);
 char top(STACK S);
 
 int main()
 {
     STACK S;
-    S=initStack();
+    initStack(&S);
 
-    push(S,'K');
-    push(S,'C');
-    push(S,'U');
-    push(S,'F');
+    push(&S,'K');
+    push(&S,'C');
+    push(&S,'U');
+    push(&S,'F');
 
     printf("Top element of stack: %c\n",top(S));
-    pop(S);
+    pop(&S);
     printf("Top element of stack: %c\n",top(S));
 
-    nullStack(S);
     return 0;
 }
 
-STACK initStack()
+void initStack(STACK* S)
 {
-    STACK S;
-    S=(STACK)malloc(sizeof(ARRAY));
-    S->data=(char*)malloc(sizeof(char)*MAX);
     S->top=-1;
-    return S;
-}
-
-void nullStack(STACK S)
-{
-    free(S->data);
-    free(S);
 }
 
 bool isEmpty(STACK S)
 {
-    return (S->top==-1)?true:false;
+    return (S.top==-1)?true:false;
 }
 
 bool isFull(STACK S)
 {
-    return (S->top==MAX-1)?true:false;
+    return (S.top==MAX-1)?true:false;
 }
 
-void push(STACK S,char elem)
+void push(STACK* S,char elem)
 {
-    if(!(isFull(S)))
+    if(!(isFull(*S)))
     {
         S->data[++S->top]=elem;
     }
 }
 
-void pop(STACK S)
+void pop(STACK* S)
 {
-    if(!(isEmpty(S)))
+    if(!(isEmpty(*S)))
     {
         S->top--;
     }
@@ -78,5 +65,5 @@ void pop(STACK S)
 
 char top(STACK S)
 {
-    return S->data[S->top];
+    return S.data[S.top];
 }
