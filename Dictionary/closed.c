@@ -12,7 +12,7 @@ DICT initDict();
 void insert(DICT *D,char elem);
 void delete(DICT *D,char elem);
 bool search(DICT D,char elem);
-void display(DICT D,char elem);
+void display(DICT D,char key);
 
 int main()
 {
@@ -22,6 +22,8 @@ int main()
     delete(&D,'A');
     insert(&D,'K');
     insert(&D,'A');
+
+    display(D,'A');
 
     return 0;
 }
@@ -77,7 +79,14 @@ bool search(DICT D,char elem)
     return ret;
 }
 
-void display(DICT D,char elem)
+void display(DICT D,char key)
 {
-
+    int ctr,size,n,k;
+    for(n=hash(key),k=n,ctr=0,size=SIZE*1.25;D[n]!=EMPTY&&ctr<size;n=(n+1)%size,ctr++)
+    {
+        if(hash(D[n])==k)
+        {
+            printf("%c ",D[n]);
+        }
+    }
 }
