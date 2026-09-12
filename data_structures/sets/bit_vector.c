@@ -1,106 +1,94 @@
-#include<stdio.h>
-#include<stdlib.h>
-#define size 10
+#include <stdio.h>
+#include <stdbool.h>
 
-typedef int SET[size];
+#define MAX_SIZE 10
 
-void initSet(SET* set);
-void insert(SET* set,int ndx);
-void delete(SET* set,int ndx);
-void display(SET set);
-SET* onion(SET A,SET B);
-SET* intersection(SET A,SET B);
-SET* difference(SET A,SET B);
+// Wrapping the array in a struct makes pass-by-value and pointer semantics much cleaner
+typedef struct {
+    bool elem[MAX_SIZE]; 
+} BitVector;
 
-int main()
-{
-    SET A={1,1,1,1,1,0,0,0,0,0};
-    SET B={0,1,0,1,0,1,0,1,0,1};
-    SET *U;
-    display(A);
-    display(B);
+// Core API
+void initSet(BitVector *S);
+void insertElem(BitVector *S, int ndx);
+void deleteElem(BitVector *S, int ndx);
+void display(const BitVector *S, const char *name);
 
-    U=onion(A,B);
+// Set Operations (Using output parameters to avoid malloc/free overhead)
+void setUnion(const BitVector *A, const BitVector *B, BitVector *result);
+void setIntersection(const BitVector *A, const BitVector *B, BitVector *result);
+void setDifference(const BitVector *A, const BitVector *B, BitVector *result);
+
+int main(void) {
+    // Struct initialization allows inline declaration cleanly
+    BitVector A = {{true, true, true, true, true, false, false, false, false, false}};
+    BitVector B = {{false, true, false, true, false, true, false, true, false, true}};
+    
+    BitVector U, I, D;
+    initSet(&U);
+    initSet(&I);
+    initSet(&D);
+
+    display(&A, "Set A");
+    display(&B, "Set B");
+
+    setUnion(&A, &B, &U);
+    display(&U, "Union (A U B)");
+
+    setIntersection(&A, &B, &I);
+    display(&I, "Intersection (A n B)");
+
+    setDifference(&A, &B, &D);
+    display(&D, "Difference (A - B)");
 
     return 0;
 }
 
-void initSet(SET* set)
-{
-    int ndx;
-    for(ndx=0;ndx<size;ndx++)
-    {
-        (*set)[ndx]=0;
+void initSet(BitVector *S) {
+    for (int i = 0; i < MAX_SIZE; i++) {
+        S->elem[i] = false;
     }
 }
 
-void insert(SET *set,int ndx)
-{
-    (*set)[ndx]=1;
-}
-
-void delete(SET *set,int ndx)
-{
-    (*set)[ndx]=0;
-}
-
-void display(SET set)
-{
-    int ndx;
-    for(ndx=0;ndx<size;ndx++)
-    {
-        printf("%d ",set[ndx]);
+void insertElem(BitVector *S, int ndx) {
+    if (ndx >= 0 && ndx < MAX_SIZE) {
+        S->elem[ndx] = true;
     }
-    printf("\n");
 }
 
-SET* onion(SET A,SET B)
-{
-    SET* set=(SET*)malloc(sizeof(SET));
-    int ndx;
-    initSet(set);
+void deleteElem(BitVector *S, int ndx) {
+    if (ndx >= 0 && ndx < MAX_SIZE) {
+        S->elem[ndx] = false;
+    }
+}
 
-    for(ndx=0;ndx<size;ndx++)
-    {
-        if(A[ndx]==1||B[ndx]==1)
-        {
-            (*set)[ndx]=1;
+void display(const BitVector *S, const char *name) {
+    printf("%-20s: { ", name);
+    bool first = true;
+    for (int i = 0; i < MAX_SIZE; i++) {
+        if (S->elem[i]) {
+            if (!first) printf(", ");
+            printf("%d", i);
+            first = false;
         }
     }
-
-    return set;
+    printf(" }\n");
 }
 
-SET* intersection(SET A,SET B)
-{
-    SET* set=(SET*)malloc(sizeof(SET));
-    int ndx;
-    initSet(set);
-
-    for(ndx=0;ndx<size;ndx++)
-    {
-        if(A[ndx]==1&&B[ndx]==1)
-        {
-            (*set)[ndx]=1;
-        }
+void setUnion(const BitVector *A, const BitVector *B, BitVector *result) {
+    for (int i = 0; i < MAX_SIZE; i++) {
+        result->elem[i] = A->elem[i] || B->elem[i];
     }
-
-    return set;
 }
 
-SET* difference(SET A,SET B)
-{
-    SET* set=(SET*)malloc(sizeof(SET));
-    int ndx;
-    initSet(set);
-
-    for(ndx=0;ndx<size;ndx++)
-    {
-        if(A[ndx]==1&&A[ndx]!=B[ndx])
-        {
-            (*set)[ndx]=1;
-        }
+void setIntersection(const BitVector *A, const BitVector *B, BitVector *result) {
+    for (int i = 0; i < MAX_SIZE; i++) {
+        result->elem[i] = A->elem[i] && B->elem[i];
     }
+}
 
-    return set;
+void setDifference(const BitVector *A, const BitVector *B, BitVector *result) {
+    for (int i = 0; i < MAX_SIZE; i++) {
+        result->elem[i] = A->elem[i] && !B->elem[i];
+    }
 }
