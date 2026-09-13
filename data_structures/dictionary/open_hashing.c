@@ -1,122 +1,139 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdbool.h>
+
 #define SIZE 10
 
-typedef struct node
-{
-    char elem;
+typedef char ElementType;
+
+typedef struct node {
+    ElementType data;
     struct node *link;
-}*NODE;
+} Node, *NodePtr;
 
-typedef struct dictionary
-{
-    NODE nodes[SIZE];
-}DICT;
+typedef struct {
+    NodePtr buckets[SIZE];
+} Dictionary;
 
-int hash(int elem);
-void initDict(DICT *D);
-void insert(DICT *D,char elem);
-void delete(DICT *D,char elem);
-bool search(DICT D,char elem);
-void display(DICT D,int key);
+// Core API
+void initDictionary(Dictionary *D);
+void freeDictionary(Dictionary *D);
+int hash(ElementType elem);
+void insertElem(Dictionary *D, ElementType elem);
+void deleteElem(Dictionary *D, ElementType elem);
+bool search(const Dictionary *D, ElementType elem);
 
-int main()
-{
-    DICT D;
-    initDict(&D);
+// Utility
+void displayBucket(const Dictionary *D, int key);
+void displayDictionary(const Dictionary *D);
 
-    insert(&D,'A');
-    insert(&D,'K');
-    display(D,1);
-    display(D,5);
-    delete(&D,'K');
-    display(D,5);
+int main(void) {
+    Dictionary D;
+    initDictionary(&D);
 
+    // 'A' (65) % 10 = 5
+    // 'K' (75) % 10 = 5  -> Collision!
+    // 'U' (85) % 10 = 5  -> Collision!
+    insertElem(&D, 'A');
+    insertElem(&D, 'K');
+    insertElem(&D, 'U');
+
+    // 'B' (66) % 10 = 6
+    insertElem(&D, 'B');
+
+    printf("--- Initial Dictionary ---\n");
+    displayDictionary(&D);
+
+    printf("\nSearching for 'K': %s\n", search(&D, 'K') ? "FOUND" : "NOT FOUND");
+    printf("Searching for 'Z': %s\n", search(&D, 'Z') ? "FOUND" : "NOT FOUND");
+
+    printf("\n--- Dictionary after deleting 'K' ---\n");
+    deleteElem(&D, 'K');
+    displayDictionary(&D);
+
+    freeDictionary(&D);
     return 0;
 }
 
-int hash(int elem)
-{
-    return elem%SIZE;
+int hash(ElementType elem) {
+    // Simple modulo hasing
+    return elem % SIZE;
 }
 
-void initDict(DICT *D)
-{
-    int n;
-    for(n=0;n<SIZE;n++)
-    {
-        D->nodes[n]=NULL;
+void initDictionary(Dictionary *D) {
+    for(int i = 0; i < SIZE; i++) {
+        D->buckets[i] = NULL;
     }
 }
 
-void insert(DICT *D,char elem)
-{
-    int n=hash(elem);
-    NODE node=(NODE)malloc(sizeof(struct node));
-    NODE *trav;
-
-    node->link=NULL;
-    node->elem=elem;
-
-    if(D->nodes[n]==NULL)
-    {
-        D->nodes[n]=node;
-    }else
-    {   
-        for(trav=&(D->nodes[n]);(*trav)->link!=NULL;trav=&(*trav)->link){}
-        (*trav)->link=node;
+void freeDictionary(Dictionary *D) {
+    for (int i = 0; i < SIZE; i++) {
+        NodePtr curr = D->buckets[i];
+        while (curr != NULL) {
+            NodePtr temp = curr;
+            curr = curr->link;
+            free(temp);
+        }
+        D->buckets[i] = NULL;
     }
 }
 
-void delete(DICT *D,char elem)
-{
-    int n=hash(elem);
-    NODE *trav,prev,del;
+void insertElem(Dictionary *D, ElementType elem) {
+    int index = hash(elem);
+    
+    NodePtr newNode = malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("CRITICAL ERROR: Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
 
-    if(D->nodes[n]!=NULL)
-    {
-        for(trav=&(D->nodes[n]);(*trav)->link!=NULL&&(*trav)->elem!=elem;trav=&(*trav)->link){}
-        if((*trav)->elem==elem)
-        {
-            del=(*trav);
-            if((*trav)->link!=NULL)
-            {
-                *trav=(*trav)->link;
-            }else
-            {
-                *trav=NULL;
-            }
-            free(del);
-            trav=NULL;
+    newNode->data = elem;
+    // O(1) Head Insertion: New node points to current head, bucket points to new node
+    newNode->link = D->buckets[index];
+    D->buckets[index] = newNode;
+}
+
+void deleteElem(Dictionary *D, ElementType elem) {
+    int index = hash(elem);
+    
+    // Using pointer2pointer makes head deletion and mid-list deletion identical
+    NodePtr *trav = &(D->buckets[index]);
+
+    while (*trav != NULL && (*trav)->data != elem) {
+        trav = &(*trav)->link;
+    }
+
+    // If *trav is not NULL, we found the element
+    if (*trav != NULL) {
+        NodePtr del = *trav;
+        *trav = del->link; // Bypass the node
+        free(del);
+    }
+}
+
+bool search(const Dictionary *D, ElementType elem) {
+    int index = hash(elem);
+
+    for (NodePtr trav = D->buckets[index]; trav != NULL; trav = trav->link) {
+        if (trav->data == elem) {
+            return true;
         }
     }
+    return false;
 }
 
-bool search(DICT D,char elem)
-{
-    bool ret;
-    NODE trav;
-    int n=hash(elem);
+void displayBucket(const Dictionary *D, int key){
+    if (key < 0 || key >= SIZE) return;
 
-    for(trav=D.nodes[n];trav!=NULL&&trav->elem!=elem;trav=trav->link)
-    ret=(trav!=NULL)?true:false;
-
-    return ret;
+    printf("Bucket [%d]: ", key);
+    for (NodePtr trav = D->buckets[key]; trav != NULL; trav = trav->link) {
+        printf("[%c] -> ", trav->data);
+    }
+    printf("NULL\n");
 }
 
-void display(DICT D,int key)
-{
-    NODE trav;
-    if(D.nodes[key]!=NULL)
-    {
-        for(trav=D.nodes[key];trav!=NULL;trav=trav->link)
-        {
-            printf("%c ",trav->elem);
-        }
-        printf("\n");
-    }else
-    {
-        printf("EMPTY\n");
+void displayDictionary(const Dictionary *D) {
+    for (int i = 0; i < SIZE; i++) {
+        displayBucket(D, i);
     }
 }

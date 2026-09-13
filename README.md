@@ -18,9 +18,9 @@ A organized collection of fundamental data structures and algorithmic implementa
 - [x] **Cursor Queue** — FIFO cursor-backed queue (`O(1)` enqueue/dequeue)
 
 ### Sets & Dictionaries
-- [ ] **Bit Vector Set** — Fast set operations via bitwise operations (`O(1)` lookups)
-- [ ] **Computer Word Set** — Set encoding in standard machine word formats
-- [ ] **Open Hashing Dictionary** — Separate chaining hash table (`O(1)` avg lookup)
+- [x] **Bit Vector Set** — Fast set operations via bitwise operations (`O(1)` lookups)
+- [x] **Computer Word Set** — Set encoding in standard machine word formats
+- [x] **Open Hashing Dictionary** — Separate chaining hash table (`O(1)` avg lookup)
 - [ ] **Closed Hashing Dictionary** — Open addressing / linear or quadratic probing (`O(1)` avg lookup)
 
 ### Trees & Priority Queues
