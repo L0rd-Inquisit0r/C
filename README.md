@@ -21,7 +21,7 @@ A organized collection of fundamental data structures and algorithmic implementa
 - [x] **Bit Vector Set** — Fast set operations via bitwise operations (`O(1)` lookups)
 - [x] **Computer Word Set** — Set encoding in standard machine word formats
 - [x] **Open Hashing Dictionary** — Separate chaining hash table (`O(1)` avg lookup)
-- [ ] **Closed Hashing Dictionary** — Open addressing / linear or quadratic probing (`O(1)` avg lookup)
+- [X] **Closed Hashing Dictionary** — Open addressing / linear or quadratic probing (`O(1)` avg lookup)
 
 ### Trees & Priority Queues
 - [ ] **Binary Tree** — Basic tree node traversals (Pre-order, In-order, Post-order)
