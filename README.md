@@ -26,7 +26,7 @@ A organized collection of fundamental data structures and algorithmic implementa
 ### Trees & Priority Queues
 - [X] **Binary Tree** — Basic tree node traversals (Pre-order, In-order, Post-order)
 - [X] **Max Heap** — Array-based Max Priority Queue (`O(log N)` insert/deleteMax, `O(N)` heapify)
-- [ ] **Min Heap** — Array-based Min Priority Queue (`O(log N)` insert/deleteMin)
+- [X] **Min Heap** — Array-based Min Priority Queue (`O(log N)` insert/deleteMin)
 - [ ] **Binary Search Tree (BST)** — Search tree supporting dynamic updates (`O(log N)` avg search)
 - [ ] **AVL Tree** — Self-balancing BST with LL/RR/LR/RL rotations (`O(log N)` worst-case search)
 - [ ] **Trie (Prefix Tree)** — Fast retrieval for dictionary strings (`O(L)` lookup where L = key length)
