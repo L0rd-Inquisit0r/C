@@ -1,144 +1,210 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <limits.h>
 
+typedef int ElementType;
 
-typedef struct node
-{
-    int val;
-    struct node *L;
-    struct node *R;
-}NODE,*BST;
+typedef struct node {
+    ElementType data;
+    struct node *left;
+    struct node *right;
+} Node, *NodePtr;
 
-void initTree(BST* root);
-void nullTree(BST* root);
-BST createNode();
+typedef NodePtr BST;
 
-void insert(BST* root,int val);
-int delete(BST* root,int val);
+// Core API
+void initTree(BST *root);
+void freeTree(BST *root);
+void insertElem(BST *root, ElementType val);
+void deleteElem(BST *root, ElementType val);
+bool search(BST root, ElementType val);
+
+// Traversal API
 void preOrder(BST root);
 void inOrder(BST root);
 void postOrder(BST root);
-int max(BST root);
-int min(BST root);
 
-int main()
-{
+// Utility
+ElementType findMin(BST root);
+ElementType findMax(BST root);
+bool isEmpty(BST root);
+
+// Internal helper
+static NodePtr createNode(ElementType val) {
+    NodePtr newNode = malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("CRITICAL ERROR: Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    newNode->data = val;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+int main(void) {
     BST tree;
-
     initTree(&tree);
 
-    insert(&tree,6);
-    insert(&tree,2);
-    insert(&tree,3);
-    insert(&tree,9);
-    insert(&tree,1);
-    insert(&tree,8);
-    insert(&tree,7);
-    insert(&tree,10);
-    insert(&tree,5);
-    insert(&tree,4);
+    // Build BST
+    insertElem(&tree,6);
+    insertElem(&tree,2);
+    insertElem(&tree,3);
+    insertElem(&tree,9);
+    insertElem(&tree,1);
+    insertElem(&tree,8);
+    insertElem(&tree,7);
+    insertElem(&tree,10);
+    insertElem(&tree,5);
+    insertElem(&tree,4);
 
+    printf("Pre-Order  : ");
     preOrder(tree);
-    printf("\n");
+    printf("\nIn-Order   : ");
+    inOrder(tree);
+    printf("\nPost-Order : ");
+    postOrder(tree);
+    printf("\n\n");
+
+    printf("Minimum element: %d\n", findMin(tree));
+    printf("Maximum element: %d\n", findMax(tree));
+
+    printf("\nDeleting node 2 (Node with 2 children)...\n");
+    deleteElem(&tree, 2);
+
+    printf("In-Order after deletion: ");
     inOrder(tree);
     printf("\n");
-    postOrder(tree);
-    printf("\n");
 
+    freeTree(&tree);
     return 0;
 }
 
-void initTree(BST* root)
-{
-    *root=NULL;
+void initTree(BST* root) {
+    *root = NULL;
 }
 
-BST createNode()
-{
-    BST node=(BST)malloc(sizeof(NODE));
-    node->L=node->R=NULL;
-
-    return node;
-}
-
-void insert(BST* root,int val)
-{
-    BST leaf;
-    BST *trav,*next;
-    for(trav=root;*trav!=NULL;trav=next)
-    {
-        next=(val>(*trav)->val)?(&(*trav)->R):(&(*trav)->L);
-    }
-    leaf=createNode();
-    leaf->val=val;
-    *trav=leaf;
-}
-
-// int delete(BST* root,int val)
-// {
-//     BST *trav,*next,del=NULL;
-//     for(trav=root;*trav!=NULL&&(*trav)->val!=val;trav=next)
-//     {
-//         next=(val>(*trav)->val)?(&(*trav)->R):(&(*trav)->L);
-//     }
-//     if(*trav!=NULL)
-//     {
-//         del=*trav;
-//     }
-//     return del->val;
-// }
-
-void preOrder(BST root)
-{
-    printf("%d ",root->val);
-    if(root->L!=NULL)
-    {
-        preOrder(root->L);
-    }
-    if(root->R!=NULL)
-    {
-        preOrder(root->R);
+void freeTree(BST *root) {
+    if (*root != NULL) {
+        freeTree(&((*root)->left));   
+        freeTree(&((*root)->right));
+        free(*root);
+        *root = NULL;   
     }
 }
 
-void inOrder(BST root)
-{
-    if(root->L!=NULL)
-    {
-        inOrder(root->L);
+void insertElem(BST *root, ElementType val) {
+    BST *trav = root;
+
+    while (*trav != NULL) {
+        if (val < (*trav)->data) {
+            trav = &((*trav)->left);
+        } else if (val > (*trav)->data) {
+            trav = &((*trav)->right);
+        } else {
+            // Duplicate values ignored in standard BST
+            return;
+        }
     }
-    printf("%d ",root->val);
-    if(root->R!=NULL)
-    {
-        inOrder(root->R);
+
+    *trav = createNode(val);
+}
+
+void deleteElem(BST* root, ElementType val) {
+    BST *trav = root;
+    
+    while (*trav != NULL && (*trav)->data != val) {
+        if (val < (*trav)->data) {
+            trav = &((*trav)->left);
+        } else {
+            trav = &((*trav)->right);
+        }
+    }
+
+    if (*trav == NULL) {
+        printf("WARNING: Element %d not found in tree.\n", val);
+        return; // Element not found
+    }
+
+    NodePtr del = *trav;
+
+    // Case 1 & 2: 0 or 1 Child
+    if ((*trav)->left == NULL) {
+        *trav = (*trav)->right;
+        free(del);
+    } else if ((*trav)->right == NULL) {
+        *trav = (*trav)->left;
+        free(del);
+    } else {
+        // Case 3: 2 Children
+        // Find in-order successor (minimum node in right subtree)
+        BST *succ = &((*trav)->right);
+        while ((*succ)->left != NULL) {
+            succ = &((*succ)->left);
+        }
+
+        // Copy successor value to current node
+        (*trav)->data = (*succ)->data;
+
+        // Delete the successor node
+        del = *succ;
+        *succ = (*succ)->right;
+        free(del);
     }
 }
 
-void postOrder(BST root)
-{
-    if(root->L!=NULL)
-    {
-        postOrder(root->L);
+bool search(BST root, ElementType val) {
+    while (root != NULL) {
+        if (val == root->data) return true;
+        root = (val < root->data) ? root->left : root->right;
     }
-    if(root->R!=NULL)
-    {
-        postOrder(root->R);
-    }
-    printf("%d ",root->val);
+    return false;
 }
 
-int min(BST root)
-{
-    BST *trav;
-    for(trav=&root;(*trav)->L!=NULL;trav=&(*trav)->L){}
-
-    return (*trav)->val;
+void preOrder(BST root) {
+    if (root == NULL) return;
+    printf("%d ", root->data);
+    preOrder(root->left);
+    preOrder(root->right);
 }
 
-int max(BST root)
-{
-    BST *trav;
-    for(trav=&root;(*trav)->R!=NULL;trav=&(*trav)->R){}
+void inOrder(BST root) {
+    if (root == NULL) return;
+    inOrder(root->left);
+    printf("%d ",root->data);
+    inOrder(root->right);
+}
 
-    return (*trav)->val;
+void postOrder(BST root) {
+    if (root == NULL) return;
+    postOrder(root->left);
+    postOrder(root->right);
+    printf("%d ", root->data);
+}
+
+ElementType findMin(BST root) {
+    if (isEmpty(root)) {
+        printf("ERROR: Tree is empty.\n");
+        return INT_MIN;
+    }
+    while (root->left != NULL) {
+        root = root->left;
+    }
+    return root->data;
+}
+
+ElementType findMax(BST root) {
+    if (isEmpty(root)) {
+        printf("ERROR: Tree is empty.\n");
+        return INT_MAX;
+    }
+    while (root->right != NULL) {
+        root = root->right;
+    }
+    return root->data;
+}
+
+bool isEmpty(BST root) {
+    return root == NULL;
 }

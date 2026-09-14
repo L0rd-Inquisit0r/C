@@ -24,7 +24,7 @@ A organized collection of fundamental data structures and algorithmic implementa
 - [X] **Closed Hashing Dictionary** — Open addressing / linear or quadratic probing (`O(1)` avg lookup)
 
 ### Trees & Priority Queues
-- [ ] **Binary Tree** — Basic tree node traversals (Pre-order, In-order, Post-order)
+- [X] **Binary Tree** — Basic tree node traversals (Pre-order, In-order, Post-order)
 - [ ] **Partially Ordered Tree (Heap)** — Binary Min/Max Heap (`O(log N)` insert/extract)
 - [ ] **Binary Search Tree (BST)** — Search tree supporting dynamic updates (`O(log N)` avg search)
 - [ ] **AVL Tree** — Self-balancing BST with LL/RR/LR/RL rotations (`O(log N)` worst-case search)
